@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+ruby '2.7.5'
+
 gem 'rails', '6.1.6.1'
 gem 'puma', '3.12.2'
 gem 'sass-rails', '5.1.0'
@@ -8,7 +10,6 @@ gem 'webpacker', '4.0.7'
 gem 'turbolinks', '5.2.0'
 gem 'jbuilder', '2.9.1'
 gem 'bootsnap', '1.4.5', require: false
-gem 'net-smtp', require: false
 
 group :development, :test do
   gem 'sqlite3', '1.4.1'
