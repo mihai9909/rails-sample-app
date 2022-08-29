@@ -4,10 +4,11 @@ class UsersController < ApplicationController
   before_action :admin_user, only: :destroy
   def show
     @user = User.find(params[:id])
+    redirect_to root_url and return unless @user.activated?
   end
 
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.where(activated: true).paginate(page: params[:page])
   end
 
   def destroy
@@ -19,9 +20,9 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      log_in(@user)
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
+      send_activation_email(@user)
+      flash[:info] = "Please check your email to activate your account."
+      redirect_to root_url
     else
       render 'new'
     end
@@ -71,5 +72,21 @@ class UsersController < ApplicationController
 
     def admin_user
       redirect_to(root_url) unless current_user.admin?
+    end
+
+    
+    def send_activation_email(user)
+      response = HTTParty.post("https://api.emailjs.com/api/v1.0/email/send",
+        :body => {service_id: 'default_service',
+                  template_id: 'template_5eqjt4j',
+                  user_id: ENV['EMAILJS_USER_ID'],
+                  template_params: {
+                    to_name: user.name,
+                    to_email: user.email,
+                    message: edit_account_activation_url(user.activation_token,
+                                                         email: user.email)
+                  },
+                  accessToken: ENV['EMAILJS_API_KEY']}.to_json,
+                  :headers => { 'Content-Type' => 'application/json' })
     end
 end
