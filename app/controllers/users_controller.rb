@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      send_activation_email(@user)
+      account_activation(@user)
       flash[:info] = "Please check your email to activate your account."
       redirect_to root_url
     else
@@ -74,8 +74,7 @@ class UsersController < ApplicationController
       redirect_to(root_url) unless current_user.admin?
     end
 
-    
-    def send_activation_email(user)
+    def account_activation(user)
       response = HTTParty.post("https://api.emailjs.com/api/v1.0/email/send",
         :body => {service_id: 'default_service',
                   template_id: 'template_5eqjt4j',
