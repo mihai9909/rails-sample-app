@@ -38,7 +38,7 @@ class PasswordResetsController < ApplicationController
   end
 
   private
-    def password_reset
+    def password_reset(user)
       response = HTTParty.post("https://api.emailjs.com/api/v1.0/email/send",
         :body => {service_id: 'default_service',
                   template_id: 'template_eitmj18',
@@ -46,7 +46,7 @@ class PasswordResetsController < ApplicationController
                   template_params: {
                     to_name: user.name,
                     to_email: user.email,
-                    message: edit_account_activation_url(user.activation_token,
+                    message: password_resets_path(user.activation_token,
                                                         email: user.email)
                   },
                   accessToken: ENV['EMAILJS_API_KEY']}.to_json,
